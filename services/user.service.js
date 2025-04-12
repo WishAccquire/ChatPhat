@@ -5,12 +5,13 @@ export const createUser = async ({ email, password }) => {
 
     try {
         
+        
         if (!email || !password) {
             throw new Error("Please Enter Email Or Password")
         }
 
         const valid = validator.isEmail(email);
-
+        
         if (!valid) {
             throw new Error("Please Enter Correct Email")
 
