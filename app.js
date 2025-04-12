@@ -2,6 +2,7 @@ import express, { response } from 'express'
 import morgan from 'morgan';
 import connect from './dB/db.js';
 import userRoutes from './routes/user.routes.js'
+import ProjectRoutes from './routes/project.routes.js'
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
 connect();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({extended:true}));
 app.use("/users",userRoutes)
+app.use("/project",ProjectRoutes)
 
 app.get('/',(req,res)=>{
     res.send("Chal gaya Mein");

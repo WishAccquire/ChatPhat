@@ -1,21 +1,23 @@
-import React,{useState,useContext} from 'react'
+import React,{useState, useContext} from 'react'
 import loginImg from '../assets/images/boxoffice.png'
 import { NavLink ,useNavigate} from 'react-router-dom'
 import axios from '../config/axios.jsx'
-//import {UserContext} from '../context/user.context.jsx'
+import {UserContext} from '../context/user.context.jsx'
 
 function LoginForm() {
 
    const [email,setEmail]=useState('');
    const [password,setPassword]=useState('')
    const navigate=useNavigate()
-   //const {setUser}=useContext(UserContext)
+   const {setUser}=useContext(UserContext)
 
 
    function submitHandle(e){
        e.preventDefault()
        axios.post('/users/login',{email,password}).then((res)=>{
         console.log(res.data)
+        localStorage.setItem('token',res.data.token)
+        setUser(res.data.user)
         navigate('/')
        }).catch((err)=>{
         console.log(err.response.data)
