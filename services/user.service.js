@@ -4,7 +4,7 @@ import validator from 'validator'
 export const createUser = async ({ email, password }) => {
 
     try {
-        
+        console.log("email",email,"password",password)
         
         if (!email || !password) {
             throw new Error("Please Enter Email Or Password")
@@ -22,6 +22,7 @@ export const createUser = async ({ email, password }) => {
             email,
             password: hashPassword
         });
+        console.log("user",user);
 
         return user
     } catch (error) {

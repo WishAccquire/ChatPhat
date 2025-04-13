@@ -22,15 +22,21 @@ export const createUserController=async(req,res)=>{
 }
 
 export const LoginController=async(req,res)=>{
+   
    const errors=validationResult(req);
    console.log(errors)
    if(!errors.isEmpty()){
+   
       return res.status(400).json({errors:errors.array()});
    }
 
    try{
+     
       const {email,password}=req.body;
+      
       const user=await userModel.findOne({email}).select('+password')
+      console.log("user",user)
+     
       if(!user){
          return res.status(401).json({
             errors:'Invalid credentials'
