@@ -14,13 +14,16 @@ function Register() {
     function submitHandle(e){
         
         e.preventDefault()
+        console.log("heelo");
         axios.post('/users/register',{email,password}).then((res)=>{
          console.log(res.data)
          localStorage.setItem('token',res.data.user)
+         console.log("hello");
          setUser(res.data.user)
          navigate('/')
         }).catch((err)=>{
-         console.log(err.response.data)
+            
+         console.log(err.message)
         })
     }
 

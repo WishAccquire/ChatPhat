@@ -13,7 +13,8 @@ function LoginForm() {
 
 
    function submitHandle(e){
-       e.preventDefault()
+       e.preventDefault();
+       console.log("hello")
        axios.post('/users/login',{email,password}).then((res)=>{
         console.log(res.data)
         localStorage.setItem('token',res.data.token)

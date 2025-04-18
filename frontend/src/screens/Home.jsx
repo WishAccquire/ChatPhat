@@ -1,12 +1,25 @@
 import React, {useContext} from 'react'
 import {UserContext} from '../context/user.context'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import axios from '../config/axios'
+import { useNavigate } from 'react-router-dom'
 
 function Home() {
   const { user } = useContext(UserContext)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
+  const [project,setProject]=useState([])
+  const navigate=useNavigate();
+
+
+  useEffect(()=>{
+    axios.get('/project/all').then((res)=>{
+     
+      setProject(res.data.projects)
+    }).catch((error)=>{
+      console.log(error);
+  })
+  },[])
 
   function createProject(e){
     e.preventDefault()
@@ -19,18 +32,30 @@ function Home() {
       setIsModalOpen(false)
 
     }).catch((error)=>{
-        console/log(error);
+        console.log(error);
     })
     setProjectName('')
    
   }
   
   return (
-    <main className='p-4'>
-      <div className='projects'>
+    <main className='p-4 '>
+      <div className='projects flex flex-wrap gap-3'>
            <button onClick={() => setIsModalOpen(true)} className='project p-4 border border-slate-300 rounded-md hover:bg-slate-100'> 
                <i className='ri-link ml-2'>New Project </i>
            </button>
+
+           {
+             project && project.map((project)=>(
+              <div key={project._id} onClick={()=>{navigate(`/project`,{
+                state:{project}
+              })}} className='project flex flex-col min-w-58  gap-2 p-4 cursor-pointer border border-slate-300 rounded-md hover:bg-slate-100'>
+                <h2 className='font-bold'>{project.name}</h2> 
+                <div className='flex gap-x-2 items-center'>
+                  <p><i className='ri-user-line mx-1'></i> Collaborators: </p> {project.users.length}</div>
+                   </div>
+             ))
+           }
       </div>
 
       {/* Modal */}

@@ -1,5 +1,5 @@
 import Project from "../models/project.model.js";
-import { createProject, getAllProjectByUserId } from "../services/project.service.js";
+import { addUsertoproject, createProject, getAllProjectByUserId, getprojectbyid } from "../services/project.service.js";
 import { validationResult} from 'express-validator';
 import userModel from '../models/user.model.js';
 
@@ -47,8 +47,14 @@ export const adduserToProject=async(req,res)=>{
       return res.status(400).json({error:errors.array()})
    }
    try{
+
       const {projectId,users}=req.body
 
+      const loggedUser=await userModel.findOne({
+         email:req.user.email
+      })
+      const project=await addUsertoproject({projectId,users,userId:loggedUser._id})
+      return res.status(200).json(project)
 
     }catch(err){
        console.log(err);
@@ -57,3 +63,15 @@ export const adduserToProject=async(req,res)=>{
     }
 }
 
+export const getProject=async (req,res)=>{
+   const {projectId}=req.params;
+   try{
+      const project = await getprojectbyid({projectId})
+      return res.status(200).json(project)
+
+
+   }catch(err){
+      console.log(err);
+      res.status(400).json({error:err.message})
+   }
+}

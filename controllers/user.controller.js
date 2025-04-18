@@ -1,9 +1,10 @@
 import userModel from "../models/user.model.js";
 import redisClient from "../services/redis.service.js";
-import {createUser} from '../services/user.service.js'
+import {createUser, getAllusers} from '../services/user.service.js'
 import { validationResult } from "express-validator";
 
 export const createUserController=async(req,res)=>{
+    
      const errors=validationResult(req);
      console.log(errors)
      if(!errors.isEmpty()){
@@ -11,6 +12,7 @@ export const createUserController=async(req,res)=>{
      }
 
      try{
+        console.log("heelo")
         const user=await createUser(req.body);
         const token=await user.generateJWT();
         delete user._doc.password;
@@ -81,5 +83,19 @@ export const logoutController=async(req,res)=>{
    }catch(err){
       console.log(err)
       res.status(400).send(err.message);
+   }
+}
+
+export const getAllUsersController=async (req,res)=>{
+   try{
+      const loggedInUser=await userModel.findOne({email:req.user.email})
+      const users=await getAllusers({userId:loggedInUser._id});
+      return res.status(200).json({
+         users
+      })
+
+   }catch(err){
+       console.log(err)
+       res.status(400).json({err:err.message})
    }
 }
