@@ -37,7 +37,7 @@ export const LoginController=async(req,res)=>{
       const {email,password}=req.body;
       
       const user=await userModel.findOne({email}).select('+password')
-      console.log("user",user)
+      console.log("userSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSss",user)
      
       if(!user){
          return res.status(401).json({
@@ -54,6 +54,7 @@ export const LoginController=async(req,res)=>{
       }
 
       const token=await user.generateJWT();
+      res.cookie('token',token)
       delete user._doc.password;
       res.status(200).json({user,token})
    }catch(error){
