@@ -32,6 +32,26 @@ function Project() {
     })
   }
 
+  const [collaborators, setCollaborators] = useState([])
+
+  useEffect(() => {
+    // Fetch project collaborators when component mounts
+      axios.get(`/project/get-project/${location.state.project._id}`)
+      .then((res) => {
+
+        
+        
+        setCollaborators(res.data.users)
+        console.log("hjk",collaborators)
+        
+      })
+      .catch((err) => {
+        console.error('Error fetching collaborators:', err)
+      })
+  }, [location.state.project._id])
+
+  
+
   const handleAddCollaborators = () => {
     // Add API call to add users to project
     axios.put('/project/add-user', {
@@ -72,16 +92,23 @@ function Project() {
         </div>
 
         <div className={`sidePanel w-full  h-full flex flex-col gap-2 bg-slate-700 absolute transition-all  ${isSidePanelOpen? 'translate-x-0' :'-translate-x-full' } top-0`}>
-          <header className='flex justify-end p-2 px-3 bg-amber-100'>
+          <header className='flex justify-between items-center p-2 px-3 bg-amber-100'>
+            <h1 className='font-bold'>Collaborators</h1>
               <button onClick={()=>setisSidePanelOpen(!isSidePanelOpen)}><i className="ri-close-circle-fill"></i></button>
           </header>
 
-          <div className="users  flex flex-col gap-2">
-            <div className="user flex cursor-pointer hover:bg-slate-50 p-2 gap-2 items-center">
-              <div className='aspect-square rounded-full w-fit h-fit flex items-center justify-center text-white p-5 bg-slate-400'><i className='ri-user-fill absolute'></i></div>
-              <h1 className='font-semibold text-lg'>username</h1>
-            </div>
-          </div>
+          
+                {
+                  isSidePanelOpen && collaborators.length>0 && collaborators.map((collaborator) => (
+                    <div key={collaborator._id} className="user flex flex-col justify-center cursor-pointer hover:bg-slate-50 p-2 gap-2 items-center">
+                      <div className='aspect-square rounded-full w-fit h-fit flex items-center justify-center text-white p-5 bg-slate-400'>
+                        <i className='ri-user-fill absolute'></i>
+                      </div>
+                      <h1 className='font-semibold text-[16px]'>{collaborator.email}</h1>
+                    </div>
+                  ))
+                }
+              
 
         </div>
 
