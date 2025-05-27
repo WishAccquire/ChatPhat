@@ -1,6 +1,7 @@
 import React ,{useState, useEffect} from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from '../config/axios'
+import { intializeSocket,recieveMessage,sendMessage } from '../config/socket';
 
 function Project() {
   const location = useLocation();
@@ -35,6 +36,8 @@ function Project() {
   const [collaborators, setCollaborators] = useState([])
 
   useEffect(() => {
+
+     intializeSocket()
     // Fetch project collaborators when component mounts
       axios.get(`/project/get-project/${location.state.project._id}`)
       .then((res) => {
@@ -48,7 +51,7 @@ function Project() {
       .catch((err) => {
         console.error('Error fetching collaborators:', err)
       })
-  }, [location.state.project._id])
+  }, [])
 
   
 
