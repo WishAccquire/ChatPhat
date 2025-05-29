@@ -1,7 +1,7 @@
 import React,{useState, useContext} from 'react'
 import loginImg from '../assets/images/boxoffice.png'
 import { NavLink ,useNavigate} from 'react-router-dom'
-import axios from '../config/axios.jsx'
+import axios from '../config/axios.js'
 import {UserContext} from '../context/user.context.jsx'
 
 function LoginForm() {

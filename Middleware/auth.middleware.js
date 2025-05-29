@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken'
-import redisClient from '../services/redis.service.js'
+// import redisClient from '../services/redis.service.js'
 
 export const authUser=async(req,res,next)=>{
     try{
         const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-        console.log("token is ISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS:",token)
       
         if(!token){
             return res.status(401).send({error:"Unautorized User"})

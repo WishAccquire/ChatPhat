@@ -4,6 +4,7 @@ import LoginForm from '../screens/LoginForm'
 import Register from '../screens/Register'
 import Home from '../screens/Home'
 import Project from '../screens/Project'
+import UserAuth from '../auth/UserAuth'
 
 function AppRoutes() {
   return (
@@ -11,10 +12,10 @@ function AppRoutes() {
       <BrowserRouter>
 
       <Routes>
-        <Route path='/' element={<Home/>} />
+        <Route path='/' element={<UserAuth><Home/></UserAuth>} />
         <Route path='/login' element={<LoginForm/>} />
         <Route path='/register' element={<Register/>} />
-        <Route path='/project' element={<Project />} />
+        <Route path='/project' element={<UserAuth><Project /></UserAuth>} />
       </Routes>
       </BrowserRouter>
 

@@ -2,7 +2,7 @@ import React,{useState, useContext} from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { UserContext } from '../context/user.context'
 import loginImg from '../assets/images/boxoffice.png'
-import axios from '../config/axios.jsx'
+import axios from '../config/axios.js'
 
 function Register() {
 

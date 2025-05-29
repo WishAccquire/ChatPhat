@@ -1,15 +1,19 @@
-import React ,{useState, useEffect} from 'react'
+import React ,{useState, useEffect,useContext, use} from 'react'
 import { useLocation } from 'react-router-dom'
-import axios from '../config/axios'
-import { intializeSocket,recieveMessage,sendMessage } from '../config/socket';
-
+import axios from '../config/axios.js'
+import { intializeSocket,receiveMessage,sendMessage } from '../config/socket';
+import {UserContext} from '../context/user.context.jsx'
+//we use room -jisme set of user hi chat kar sake
 function Project() {
   const location = useLocation();
   const [isSidePanelOpen, setisSidePanelOpen] = useState(false)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
   const [users, setUsers] = useState([])
   const [selectedUsers, setSelectedUsers] = useState([])
-  console.log(location.state)
+  const [message, setMessage] = useState('')
+  const project = location.state.project; // Assuming project data is passed in state
+  const {user} = useContext(UserContext)
+  
 
   useEffect(() => {
     // Fetch all users when modal opens
@@ -23,6 +27,7 @@ function Project() {
         })
     }
   }, [isUserModalOpen])
+  
 
   const handleUserSelect = (userId) => {
     setSelectedUsers(prev => {
@@ -35,25 +40,29 @@ function Project() {
 
   const [collaborators, setCollaborators] = useState([])
 
+  const [messages, setMessages] = useState([]);
+
   useEffect(() => {
+    const socket = intializeSocket(project._id);
 
-     intializeSocket()
+  
+
+    // Now set up your listener
+    receiveMessage('message', (data) => {
+      console.log('✅ Received message:', data);
+    });
+ 
+
     // Fetch project collaborators when component mounts
-      axios.get(`/project/get-project/${location.state.project._id}`)
+    axios.get(`/project/get-project/${location.state.project._id}`)
       .then((res) => {
-
-        
-        
         setCollaborators(res.data.users)
-        console.log("hjk",collaborators)
-        
+        console.log("Collaborators:", res.data.users)
       })
       .catch((err) => {
         console.error('Error fetching collaborators:', err)
       })
-  }, [])
-
-  
+  }, [])  
 
   const handleAddCollaborators = () => {
     // Add API call to add users to project
@@ -69,6 +78,19 @@ function Project() {
     .catch((err) => {
       console.error('Error adding users:', err)
     })
+  }
+
+  const send = () => {
+    //iske call pe message emit ho jayega client se server pe,
+    //and then server will broadcast to all the users in that room
+    console.log("message",message)
+    sendMessage('message', {
+      message,
+      sender:user._id
+    });
+    console.log("message sent") 
+    setMessage(''); // Clear the input field after sending
+
   }
 
   return (
@@ -89,8 +111,13 @@ function Project() {
             <div className="ml-auto max-w-64 message flex flex-col w-fit bg-slate-50 rounded-md p-2  "><small className='opacity-65 text-xs'>example@gmail.com</small><p className='text-sm'>badiya </p></div>
           </div>
           <div className="input-field w-full flex">
-            <input type='text' className='p-2 px-4 bg-white  outline-None' placeholder='Enter Message' />
-            <button className='flex-grow bg-blue-100 px-3 text-blue-500 text-3xl'><i className="ri-send-plane-fill "></i></button>
+            <input 
+            type='text'
+            value={message}
+            onChange={(e) => setMessage(e.target.value)} 
+            className='p-2 px-4 bg-white  outline-None' 
+            placeholder='Enter Message' />
+            <button onClick={send} className='flex-grow bg-blue-100 px-3 text-blue-500 text-3xl'><i className="ri-send-plane-fill "></i></button>
           </div>
         </div>
 

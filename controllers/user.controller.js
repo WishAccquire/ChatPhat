@@ -1,5 +1,5 @@
 import userModel from "../models/user.model.js";
-import redisClient from "../services/redis.service.js";
+// import redisClient from "../services/redis.service.js";
 import {createUser, getAllusers} from '../services/user.service.js'
 import { validationResult } from "express-validator";
 
@@ -37,8 +37,7 @@ export const LoginController=async(req,res)=>{
       const {email,password}=req.body;
       
       const user=await userModel.findOne({email}).select('+password')
-      console.log("userSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSss",user)
-     
+      
       if(!user){
          return res.status(401).json({
             errors:'Invalid credentials'
