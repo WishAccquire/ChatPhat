@@ -12,7 +12,6 @@ export const createUserController=async(req,res)=>{
      }
 
      try{
-        console.log("heelo")
         const user=await createUser(req.body);
         const token=await user.generateJWT();
         delete user._doc.password;
@@ -74,7 +73,7 @@ export const logoutController=async(req,res)=>{
    try{
       const token=req.cookies.token || req.header('Authorization').replace('Bearer ','');
 
-      redisClient.set(token,'logout','EX',60*60*24);
+      //redisClient.set(token,'logout','EX',60*60*24);
 
       res.status(200).json({
          message:"logged out succefully"

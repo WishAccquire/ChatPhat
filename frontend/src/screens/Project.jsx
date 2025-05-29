@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import axios from '../config/axios.js'
 import { intializeSocket,receiveMessage,sendMessage } from '../config/socket';
 import {UserContext} from '../context/user.context.jsx'
+import { createRef } from 'react';
 //we use room -jisme set of user hi chat kar sake
 function Project() {
   const location = useLocation();
@@ -12,7 +13,9 @@ function Project() {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [message, setMessage] = useState('')
   const project = location.state.project; // Assuming project data is passed in state
-  const {user} = useContext(UserContext)
+  const { user } = useContext(UserContext); // Get the current user from context
+  const messageBox=createRef();
+ 
   
 
   useEffect(() => {
@@ -50,6 +53,8 @@ function Project() {
     // Now set up your listener
     receiveMessage('message', (data) => {
       console.log('✅ Received message:', data);
+      appendIncomingMessage(data);
+      
     });
  
 
@@ -57,7 +62,7 @@ function Project() {
     axios.get(`/project/get-project/${location.state.project._id}`)
       .then((res) => {
         setCollaborators(res.data.users)
-        console.log("Collaborators:", res.data.users)
+        
       })
       .catch((err) => {
         console.error('Error fetching collaborators:', err)
@@ -83,20 +88,54 @@ function Project() {
   const send = () => {
     //iske call pe message emit ho jayega client se server pe,
     //and then server will broadcast to all the users in that room
-    console.log("message",message)
+    
     sendMessage('message', {
       message,
-      sender:user._id
+      sender:user
     });
-    console.log("message sent") 
+    appendOutgoingMessage(message,user)
+     
     setMessage(''); // Clear the input field after sending
 
   }
 
+  function scrollToBottom() {
+
+      messageBox.current.scrollTop = messageBox.current.scrollHeight;
+
+  }
+
+  function appendIncomingMessage(data) {
+    const messageBox=document.querySelector('.message-box');
+    // Append the incoming message to the message box
+    const mdata=document.createElement('div');
+    mdata.classList.add('message','max-w-64','flex','flex-col','w-fit','bg-slate-50','rounded-md','p-2');
+    mdata.innerHTML=`
+      <small class='opacity-65 text-xs'>${data.sender.email}</small>
+      <p class='text-sm'>${data.message}</p>
+    `
+
+    messageBox.appendChild(mdata);
+    scrollToBottom(); // Scroll to the bottom after appending the message
+  }
+
+  function appendOutgoingMessage(data,userw) {
+    const messageBox=document.querySelector('.message-box');
+    // Append the outgoing message to the message box
+    const mdata=document.createElement('div');
+    mdata.classList.add('ml-auto','max-w-64','message','flex','flex-col','w-fit','bg-slate-50','rounded-md','p-2');
+    mdata.innerHTML=`
+      <small class='opacity-65 text-xs'>${userw.email}</small>
+      <p class='text-sm'>${data}</p>
+    `
+
+    messageBox.appendChild(mdata);
+    scrollToBottom(); // Scroll to the bottom after appending the message
+  }
   return (
     <main className='h-screen w-screen flex '>
-      <section className='left h-full relative flex flex-col  min-w-72 bg-red-200'>
-        <header className='flex justify-between items-center p-2 w-full bg-red-300 '>
+      <section className='left h-screen relative flex flex-col  min-w-72 bg-red-200'>
+        <header className='flex justify-between items-center p-2 w-full bg-red-300 absolute top-0 '>
           <button className='flex gap-2' onClick={() => setIsUserModalOpen(true)}>
             <i className='ri-add-fill mr-1'></i>
             <p>Add Collaborator</p>
@@ -105,12 +144,11 @@ function Project() {
             <i className="ri-group-fill "></i>
           </button>
         </header>
-        <div className="conversation-area flex-grow flex flex-col rounded-md ">
-          <div className="message-box flex-grow flex flex-col text-slate-700 gap-1 p-2">
-            <div className=" message max-w-64 flex flex-col w-fit bg-slate-50 rounded-md p-2  "><small className='opacity-65 text-xs'>example@gmail.com</small><p className='text-sm'>hello kya haal chal?? </p></div>
-            <div className="ml-auto max-w-64 message flex flex-col w-fit bg-slate-50 rounded-md p-2  "><small className='opacity-65 text-xs'>example@gmail.com</small><p className='text-sm'>badiya </p></div>
+        <div className="conversation-area pt-14 flex-grow flex flex-col rounded-md relative overflow-hidden">
+          <div ref={messageBox} className="message-box flex-grow flex flex-col text-slate-700 gap-1 p-2 pb-12 overflow-auto max-h-full ">
+            
           </div>
-          <div className="input-field w-full flex">
+          <div className="input-field w-full absolute bottom-0 flex">
             <input 
             type='text'
             value={message}

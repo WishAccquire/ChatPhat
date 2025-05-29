@@ -36,7 +36,7 @@ io.use(async(socket,next)=>{
       if(!decoded){
         return next(new Error("Authenticate error"))
       }
-      console.log("Decoded user:", decoded);
+      
       socket.user=decoded
       next();
     }catch(err){
@@ -51,7 +51,7 @@ io.on('connection', socket => {
         return;
     }
     socket.roomId = socket.project._id.toString();
-    console.log(`User ${socket.user._id} connected to project ${socket.roomId}`);
+    
     socket.join(socket.roomId);
     socket.on('message', (data) => {
         // Handle incoming messages
@@ -60,7 +60,10 @@ io.on('connection', socket => {
         socket.broadcast.to(socket.roomId).emit('message', data);
     });
         
-  socket.on('disconnect', () => { /* … */ });
+  socket.on('disconnect', () => {
+    confirm(`User ${socket.user.email} disconnected from project ${socket.project.name}`);
+    socket.leave(socket.roomId);
+   });
 });
 
 
