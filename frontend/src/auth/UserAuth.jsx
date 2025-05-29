@@ -12,12 +12,10 @@ function UserAuth({children}) {
   
 
   useEffect(() => {
-    if(!token) {    
+    if(!token || !user) {    
         navigate('/login') 
     }
-    if(!user) {   
-        navigate('/login') 
-    }  
+     
     else{
         navigate('/')
         setLoading(false)

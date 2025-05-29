@@ -52,6 +52,7 @@ io.on('connection', socket => {
     }
     socket.roomId = socket.project._id.toString();
     console.log(`User ${socket.user._id} connected to project ${socket.roomId}`);
+    socket.join(socket.roomId);
     socket.on('message', (data) => {
         // Handle incoming messages
         console.log('Message received:', data);
@@ -59,7 +60,6 @@ io.on('connection', socket => {
         socket.broadcast.to(socket.roomId).emit('message', data);
     });
         
-  socket.on('event', data => { /* … */ });
   socket.on('disconnect', () => { /* … */ });
 });
 
