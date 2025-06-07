@@ -15,7 +15,10 @@ function LoginForm() {
    function submitHandle(e){
        e.preventDefault();
        axios.post('/users/login',{email,password}).then((res)=>{
+        console.log("Login response:",res.data)
         localStorage.setItem('token',res.data.token)
+        
+        // Store user data in localStorage
         localStorage.setItem('user',JSON.stringify(res.data.user))
         // setUser is a function from UserContext to update the user state
         setUser(res.data.user)

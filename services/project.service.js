@@ -2,8 +2,6 @@ import mongoose from "mongoose";
 import Project from "../models/project.model.js";
 
 
-
-
 export const createProject = async ({
     name, userId
 }) => {
@@ -78,7 +76,9 @@ export const addUsertoproject = async ({ projectId, users, userId }) => {
         }
     }, { new: true })
 
-    return updateproject
+    const updatedProject = await Project.findById(projectId).populate('users', 'email');
+    
+    return updatedProject
 
 }
 
@@ -91,6 +91,27 @@ export const getprojectbyid = async ({ projectId }) => {
         throw new Error('Invalid project ID format')
     }
     const project = await Project.findOne({ _id: projectId }).populate('users')
+    return project
+
+}
+
+export const updateFileTree = async ({ projectId, fileTree }) => {
+    if (!projectId) {
+        throw new Error('project Id  is required')
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+        throw new Error('Invalid project ID format')
+    }
+
+    if (!fileTree) {
+        throw new Error('file tree is required')
+    }
+
+    const project = await Project.findOneAndUpdate({ _id: projectId }, {
+        fileTree
+    }, { new: true })
+
     return project
 
 }

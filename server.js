@@ -84,8 +84,7 @@ io.on('connection', socket => {
     socket.leave(socket.roomId);
   });
 
-
-  server.listen(process.env.PORT || 3000, () => {
+});
+server.listen(process.env.PORT || 3000, () => {
     console.log('server is running')
   });
-});

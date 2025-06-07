@@ -23,13 +23,23 @@ function Home() {
 
   function createProject(e){
     e.preventDefault()
-    console.log("project creating with name:", projectName)
+    if (!projectName.trim()) {
+      alert('Project name cannot be empty');
+      return;
+    }
     axios.post('/project/create',{
       name:projectName
     }).then((res)=>{
       console.log(res)
+      
      
       setIsModalOpen(false)
+      axios.get('/project/all').then((res)=>{
+     
+      setProject(res.data.projects)
+    }).catch((error)=>{
+      console.log(error);
+  })
 
     }).catch((error)=>{
         console.log(error);
