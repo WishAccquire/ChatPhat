@@ -2,6 +2,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai"
 
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY);
+//prompt for the model to generate code for a MERN stack application with best practices and modular structure
+// The model will generate a file tree structure with the necessary files and their contents
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
     generationConfig: {
@@ -104,6 +106,5 @@ const model = genAI.getGenerativeModel({
 export const generateResult = async (prompt) => {
 
     const result = await model.generateContent(prompt);
-
     return result.response.text()
 }

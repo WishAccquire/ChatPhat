@@ -59,28 +59,30 @@ io.on('connection', socket => {
 
     const message = data.message;
 
+
     const aiIsPresentInMessage = message.includes('@ai');
-
-    socket.broadcast.to(socket.roomId).emit('project-message', data);
-
     if (aiIsPresentInMessage) {
       const prompt = message.replace('@ai', '');
       const result = await generateResult(prompt);
       io.to(socket.roomId).emit('project-message', {
         message: result,
-        user: {
+        sender: {
           _id: 'ai',
           email: 'AI'
         }
       })
       return
     }
+
+    socket.broadcast.to(socket.roomId).emit('project-message', data);
+
+    
   })
 
 
 
   socket.on('disconnect', () => {
-    confirm(`User ${socket.user.email} disconnected from project ${socket.project.name}`);
+    console.log(`User ${socket.user.email} disconnected from project ${socket.project.name}`);
     socket.leave(socket.roomId);
   });
 

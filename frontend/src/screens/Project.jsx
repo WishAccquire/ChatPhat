@@ -53,7 +53,7 @@ const Project = () => {
       projectId: project._id,
       users: Array.from(selectedUserId)
     }).then(res => {
-      console.log(res.data)
+
        setProject(res.data)
       setIsModalOpen(false)
     }).catch(err => {
@@ -68,13 +68,14 @@ const Project = () => {
     })
     setMessages(prev => [...prev, { sender: user, message }])
     setMessage("")
+    messageBox.current.scrollTop = messageBox.current.scrollHeight;
   }
 
   function WriteAiMessage(message) {
     const messageObject = JSON.parse(message)
 
     return (
-      <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
+      <div className='overflow-auto rounded-sm p-2'>
         <Markdown
           children={messageObject.text}
           options={{ overrides: { code: SyntaxHighlightedCode } }}
