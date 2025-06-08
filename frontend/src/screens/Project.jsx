@@ -72,17 +72,16 @@ const Project = () => {
   }
 
   function WriteAiMessage(message) {
-    const messageObject = JSON.parse(message)
+  // If the message is an object, try to extract the markdown string
+  const messageobject=JSON.parse(message)
+  
 
-    return (
-      <div className='overflow-auto rounded-sm p-2'>
-        <Markdown
-          children={messageObject.text}
-          options={{ overrides: { code: SyntaxHighlightedCode } }}
-        />
-      </div>
-    )
-  }
+  return (
+    <div className='overflow-auto rounded-sm  p-2'>
+      <Markdown options={{overrides:{code:SyntaxHighlightedCode}}}>{messageobject.text}</Markdown>
+    </div>
+  );
+}
 
   useEffect(() => {
 
@@ -139,7 +138,7 @@ const Project = () => {
             ref={messageBox}
             className="message-box p-1 flex-grow flex flex-col gap-1 overflow-auto max-h-full scrollbar-hide">
             {messages.map((msg, index) => (
-              <div key={index} className={`${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-52'} ${msg.sender._id === user._id && 'ml-auto'} message flex flex-col p-2 bg-slate-50 w-fit rounded-md`}>
+              <div key={index} className={`${msg.sender._id === 'ai' ? 'max-w-84' : 'max-w-52'} ${msg.sender._id === user._id && 'ml-auto'} message flex flex-col p-2 bg-slate-50 w-fit rounded-md`}>
                 <small className='opacity-65 text-xs'>{msg.sender.email}</small>
                 <div className='text-sm'>
                   {msg.sender._id === 'ai' ? WriteAiMessage(msg.message) : <p>{msg.message}</p>}

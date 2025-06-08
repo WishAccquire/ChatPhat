@@ -61,6 +61,7 @@ io.on('connection', socket => {
 
 
     const aiIsPresentInMessage = message.includes('@ai');
+    socket.broadcast.to(socket.roomId).emit('project-message', data);
     if (aiIsPresentInMessage) {
       const prompt = message.replace('@ai', '');
       const result = await generateResult(prompt);
@@ -74,7 +75,7 @@ io.on('connection', socket => {
       return
     }
 
-    socket.broadcast.to(socket.roomId).emit('project-message', data);
+    
 
     
   })
