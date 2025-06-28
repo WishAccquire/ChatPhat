@@ -72,70 +72,16 @@ const Project = () => {
   }
 
   function WriteAiMessage(message) {
-    let messageObject;
-    try {
-      messageObject = typeof message === "string" ? JSON.parse(message) : message;
-    } catch {
-      // If not JSON, treat as markdown string
-      messageObject = { text: message };
-    }
+  // If the message is an object, try to extract the markdown string
+  const messageobject=JSON.parse(message)
+  
 
-    return (
-      <div className='overflow-auto rounded-sm p-2 flex flex-col gap-4'>
-        {/* Render main text if present */}
-        {messageObject.text && (
-          <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
-            {messageObject.text}
-          </Markdown>
-        )}
-
-        {/* Render functions if present */}
-        {Array.isArray(messageObject.functions) && messageObject.functions.length > 0 && (
-          <div className="functions-list flex flex-col gap-4">
-            {messageObject.functions.map((fn, idx) => (
-              <div key={idx} className="function-block p-2 bg-slate-100 rounded">
-                <h3 className="font-semibold mb-1">{fn.name}</h3>
-                {fn.description && <p className="mb-1">{fn.description}</p>}
-                {fn.parameters && (
-                  <div className="mb-1">
-                    <strong>Parameters:</strong>
-                    <ul className="list-disc ml-5">
-                      {fn.parameters.map((param, i) => (
-                        <li key={i}>
-                          <b>{param.name}</b> (<i>{param.type}</i>): {param.description}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {fn.returnType && (
-                  <div className="mb-1">
-                    <strong>Returns:</strong> <span>{fn.returnType}</span>
-                  </div>
-                )}
-                {fn.code && (
-                  <div className="mb-1">
-                    <strong>Code:</strong>
-                    <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
-                      {`\`\`\`javascript\n${fn.code}\n\`\`\``}
-                    </Markdown>
-                  </div>
-                )}
-                {fn.example && (
-                  <div>
-                    <strong>Example:</strong>
-                    <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
-                      {`\`\`\`javascript\n${fn.example}\n\`\`\``}
-                    </Markdown>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
+  return (
+    <div className='overflow-auto rounded-sm  p-2'>
+      <Markdown options={{overrides:{code:SyntaxHighlightedCode}}}>{messageobject.text}</Markdown>
+    </div>
+  );
+}
 
   useEffect(() => {
 

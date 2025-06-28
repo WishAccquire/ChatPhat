@@ -13,7 +13,8 @@ function Home() {
 
 
   useEffect(()=>{
-    axios.get('/project/all').then((res)=>{
+    const token = localStorage.getItem('token')
+    axios.get('/project/all',{headers:{Authorization: `Bearer ${token}`} }).then((res)=>{
      
       setProject(res.data.projects)
     }).catch((error)=>{
@@ -22,19 +23,23 @@ function Home() {
   },[])
 
   function createProject(e){
+    const token = localStorage.getItem('token')
     e.preventDefault()
     if (!projectName.trim()) {
       alert('Project name cannot be empty');
       return;
     }
+    
     axios.post('/project/create',{
       name:projectName
+    },{
+      headers:{Authorization: `Bearer ${token}`}
     }).then((res)=>{
       console.log(res)
       
      
       setIsModalOpen(false)
-      axios.get('/project/all').then((res)=>{
+      axios.get('/project/all',{headers:{Authorization: `Bearer ${token}`} }).then((res)=>{
      
       setProject(res.data.projects)
     }).catch((error)=>{

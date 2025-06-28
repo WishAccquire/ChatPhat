@@ -2,6 +2,79 @@ import userModel from "../models/user.model.js";
 // import redisClient from "../services/redis.service.js";
 import {createUser, getAllusers} from '../services/user.service.js'
 import { validationResult } from "express-validator";
+import validator from "validator";
+import otpGenerator from 'otp-generator';
+import OTP from "../models/OTP.model.js";
+
+export const sendOtp = async (req, res) => {
+    try {
+        //req ki body se email aayega
+        const {email}  = req.body;
+        
+        //validator email is valid or not
+       
+        const valid = validator.isEmail(email);
+        
+        if (!valid) {
+            return res.status(401).json({
+                success: false,
+                message: "Please Enter Correct Email"
+            })
+        }
+        
+
+        const checkEmail = await userModel.findOne({ email });
+        if (checkEmail) {
+            return res.status(401).json({
+                success: false,
+                message: "The Email is Already Register"
+            })
+        }
+
+        //generateotp
+        var generateotp = otpGenerator.generate(6, {
+            upperCaseAlphabets: false,
+            lowerCaseAlphabets: false,
+            specialChars: false,
+
+        })
+        //var generateotp=crypto.randomInt(10 ** (6 - 1), 10 ** length).toString();
+        //console.log("otp generate:", generateotp);
+
+        const result = await OTP.findOne({ otp: generateotp });
+       
+        //check unique
+        while (result) {
+            generateotp = otpGenerator.generate(6, {
+                upperCaseAlphabets: false,
+                lowerCaseAlphabets: false,
+                specialChars: false,
+            })
+            result = await OTP.findOne({ Otp: generateotp });
+        }
+        const payload = { Email: email, Otp: generateotp };
+        
+
+        const body = await OTP.create(payload);
+        console.log(body);
+
+        res.status(201).json({
+            success: true,
+            message: 'OTP Send Successfully',
+            data: body,
+        })
+
+
+    } catch (err) {
+        return res.status(501).json({
+            success: false,
+            message: err.message,
+            data: "Failed to send otp"
+        })
+    }
+
+
+}
 
 export const createUserController=async(req,res)=>{
     
@@ -34,6 +107,14 @@ export const LoginController=async(req,res)=>{
    try{
      
       const {email,password}=req.body;
+
+      const valid = validator.isEmail(email);
+        if (!valid) {
+            return res.status(401).json({
+                success: false,
+                message: "Please Enter Correct Email"
+            })
+        }
       
       const user=await userModel.findOne({email}).select('+password')
       
