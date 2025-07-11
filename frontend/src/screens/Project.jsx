@@ -5,7 +5,7 @@ import axios from '../config/axios'
 import { initializeSocket, receiveMessage, sendMessage } from '../config/socket'
 import Markdown from 'markdown-to-jsx'
 import hljs from 'highlight.js'
-import { getWebContainer } from '../config/webContainer.js'
+import { getWebContainer } from '../config/webContainer'
 
 function SyntaxHighlightedCode(props) {
   const ref = useRef(null)
@@ -39,6 +39,7 @@ const Project = () => {
   const [webContainer, setWebContainer] = useState(null)
   const [iframeUrl, setIframeUrl] = useState(null)
   const [runProcess,setrunProcess]=useState(null)
+  
   const handleUserClick = (id) => {
     setSelectedUserId(prev => {
       const newSet = new Set(prev)
@@ -72,16 +73,70 @@ const Project = () => {
   }
 
   function WriteAiMessage(message) {
-  // If the message is an object, try to extract the markdown string
-  const messageobject=JSON.parse(message)
-  
+    let messageObject;
+    try {
+      messageObject = typeof message === "string" ? JSON.parse(message) : message;
+    } catch {
+      // If not JSON, treat as markdown string
+      messageObject = { text: message };
+    }
 
-  return (
-    <div className='overflow-auto rounded-sm  p-2'>
-      <Markdown options={{overrides:{code:SyntaxHighlightedCode}}}>{messageobject.text}</Markdown>
-    </div>
-  );
-}
+    return (
+      <div className='overflow-auto rounded-sm p-2 flex flex-col gap-4'>
+        {/* Render main text if present */}
+        {messageObject.text && (
+          <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
+            {messageObject.text}
+          </Markdown>
+        )}
+
+        {/* Render functions if present */}
+        {Array.isArray(messageObject.functions) && messageObject.functions.length > 0 && (
+          <div className="functions-list flex flex-col gap-4">
+            {messageObject.functions.map((fn, idx) => (
+              <div key={idx} className="function-block p-2 bg-slate-100 rounded">
+                <h3 className="font-semibold mb-1">{fn.name}</h3>
+                {fn.description && <p className="mb-1">{fn.description}</p>}
+                {fn.parameters && (
+                  <div className="mb-1">
+                    <strong>Parameters:</strong>
+                    <ul className="list-disc ml-5">
+                      {fn.parameters.map((param, i) => (
+                        <li key={i}>
+                          <b>{param.name}</b> (<i>{param.type}</i>): {param.description}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {fn.returnType && (
+                  <div className="mb-1">
+                    <strong>Returns:</strong> <span>{fn.returnType}</span>
+                  </div>
+                )}
+                {fn.code && (
+                  <div className="mb-1">
+                    <strong>Code:</strong>
+                    <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
+                      {`\`\`\`javascript\n${fn.code}\n\`\`\``}
+                    </Markdown>
+                  </div>
+                )}
+                {fn.example && (
+                  <div>
+                    <strong>Example:</strong>
+                    <Markdown options={{ overrides: { code: SyntaxHighlightedCode } }}>
+                      {`\`\`\`javascript\n${fn.example}\n\`\`\``}
+                    </Markdown>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   useEffect(() => {
 
@@ -114,6 +169,10 @@ const Project = () => {
 
     axios.get(`/project/get-project/${project._id}`).then(res => {
       setProject(res.data)
+      // Load existing file tree from project if available
+      if (res.data.fileTree) {
+        setFileTree(res.data.fileTree)
+      }
     })
 
     axios.get('/users/all').then(res => {
@@ -124,6 +183,20 @@ const Project = () => {
   function saveFileTree(ft){
     axios.put('/project/update-file-tree',
       {projectId:project._id,fileTree:ft}).then(res=>{console.log(res.data)}).catch(err=>{console.log(err)})
+  }
+
+  // Helper function to get file content safely
+  const getFileContent = (fileName) => {
+    if (!fileTree[fileName]) return '';
+    
+    // Handle different possible structures
+    if (fileTree[fileName].file && fileTree[fileName].file.contents) {
+      return fileTree[fileName].file.contents;
+    }
+    if (typeof fileTree[fileName] === 'string') {
+      return fileTree[fileName];
+    }
+    return '';
   }
 
   return (
@@ -157,6 +230,7 @@ const Project = () => {
             <input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && send()}
               className='p-2 px-4 border-none outline-none flex-grow bg-slate-50'
               type="text"
               placeholder='Enter message'
@@ -197,7 +271,7 @@ const Project = () => {
                   setCurrentFile(file)
                   setOpenFiles([...new Set([...openFiles, file])])
                 }}
-                className="tree-element cursor-pointer p-2 px-4 flex items-center gap-2 bg-slate-300 w-full"
+                className={`tree-element cursor-pointer p-2 px-4 flex items-center gap-2 w-full ${currentFile === file ? 'bg-slate-400' : 'bg-slate-300'}`}
               >
                 <p className='font-semibold text-lg'>{file}</p>
               </button>
@@ -212,9 +286,24 @@ const Project = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentFile(file)}
-                  className={`open-file cursor-pointer p-2 px-4 flex items-center w-fit gap-2 bg-slate-300 ${currentFile === file ? 'bg-slate-400' : ''}`}
+                  className={`open-file cursor-pointer p-2 px-4 flex items-center w-fit gap-2 ${currentFile === file ? 'bg-slate-400' : 'bg-slate-300'}`}
                 >
                   <p className='font-semibold text-lg'>{file}</p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const newOpenFiles = openFiles.filter(f => f !== file)
+                      setOpenFiles(newOpenFiles)
+                      if (currentFile === file && newOpenFiles.length > 0) {
+                        setCurrentFile(newOpenFiles[0])
+                      } else if (currentFile === file) {
+                        setCurrentFile(null)
+                      }
+                    }}
+                    className='ml-2 hover:bg-slate-500 px-1 rounded'
+                  >
+                    ×
+                  </button>
                 </button>
               ))}
             </div>
@@ -222,37 +311,46 @@ const Project = () => {
             <div className="actions flex gap-2">
               <button
                 onClick={async () => {
-                  await webContainer.mount(fileTree)
-
-                  const installProcess = await webContainer.spawn("npm", ["install"])
-                  installProcess.output.pipeTo(new WritableStream({
-                    write(chunk) { console.log(chunk) }
-                  }))
-
-                  if(runProcess){
-                    runProcess.kill()
+                  if (!webContainer || Object.keys(fileTree).length === 0) {
+                    console.log('WebContainer not ready or no files')
+                    return
                   }
 
-                  let tempRunProcess = await webContainer.spawn("npm", ["start"])
-                  tempRunProcess.output.pipeTo(new WritableStream({
-                    write(chunk) { console.log(chunk) }
-                  }))
-                  setrunProcess(tempRunProcess)
+                  try {
+                    await webContainer.mount(fileTree)
 
-                  webContainer.on('server-ready', (port, url) => {
-                    console.log(port, url)
-                    setIframeUrl(url)
-                  })
+                    const installProcess = await webContainer.spawn("npm", ["install"])
+                    installProcess.output.pipeTo(new WritableStream({
+                      write(chunk) { console.log(chunk) }
+                    }))
+
+                    if(runProcess){
+                      runProcess.kill()
+                    }
+
+                    let tempRunProcess = await webContainer.spawn("npm", ["start"])
+                    tempRunProcess.output.pipeTo(new WritableStream({
+                      write(chunk) { console.log(chunk) }
+                    }))
+                    setrunProcess(tempRunProcess)
+
+                    webContainer.on('server-ready', (port, url) => {
+                      console.log(port, url)
+                      setIframeUrl(url)
+                    })
+                  } catch (error) {
+                    console.error('Error running project:', error)
+                  }
                 }}
-                className='p-2 px-4 bg-slate-300 text-white'
+                className='p-2 px-4 bg-slate-600 text-white rounded hover:bg-slate-700'
               >
-                run
+                Run
               </button>
             </div>
           </div>
 
           <div className="bottom flex flex-grow max-w-full shrink overflow-auto">
-            {fileTree[currentFile] && (
+            {currentFile && getFileContent(currentFile) ? (
               <div className="code-editor-area h-full overflow-auto flex-grow bg-slate-50">
                 <pre className="hljs h-full">
                   <code
@@ -261,9 +359,9 @@ const Project = () => {
                     suppressContentEditableWarning
                     onBlur={(e) => {
                       const updatedContent = e.target.innerText
-                      const ft={
+                      const ft = {
                         ...fileTree,
-                         [currentFile]: {
+                        [currentFile]: {
                           file: {
                             contents: updatedContent
                           }
@@ -273,7 +371,7 @@ const Project = () => {
                       saveFileTree(ft)
                     }}
                     dangerouslySetInnerHTML={{
-                      __html: hljs.highlight('javascript', fileTree[currentFile].file.contents).value
+                      __html: hljs.highlight('javascript', getFileContent(currentFile)).value
                     }}
                     style={{
                       whiteSpace: 'pre-wrap',
@@ -282,6 +380,12 @@ const Project = () => {
                     }}
                   />
                 </pre>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full w-full bg-slate-100">
+                <p className="text-slate-500">
+                  {currentFile ? 'File content not available' : 'Select a file to view'}
+                </p>
               </div>
             )}
           </div>
@@ -297,7 +401,7 @@ const Project = () => {
       </section>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-md w-96 max-w-full relative">
             <header className='flex justify-between items-center mb-4'>
               <h2 className='text-xl font-semibold'>Select User</h2>
