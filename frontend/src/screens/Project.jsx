@@ -38,8 +38,8 @@ const Project = () => {
   const [openFiles, setOpenFiles] = useState([])
   const [webContainer, setWebContainer] = useState(null)
   const [iframeUrl, setIframeUrl] = useState(null)
-  const [runProcess,setrunProcess]=useState(null)
-  
+  const [runProcess, setrunProcess] = useState(null)
+
   const handleUserClick = (id) => {
     setSelectedUserId(prev => {
       const newSet = new Set(prev)
@@ -55,7 +55,7 @@ const Project = () => {
       users: Array.from(selectedUserId)
     }).then(res => {
 
-       setProject(res.data)
+      setProject(res.data)
       setIsModalOpen(false)
     }).catch(err => {
       console.log(err)
@@ -154,14 +154,14 @@ const Project = () => {
 
       if (data.sender._id === 'ai') {
         try {
-      const messageObj = JSON.parse(data.message);
-      if (messageObj.fileTree) {
-        webContainer?.mount(messageObj.fileTree);
-        setFileTree(messageObj.fileTree);
-      }
-    } catch (e) {
-      // Not JSON, ignore
-    }
+          const messageObj = JSON.parse(data.message);
+          if (messageObj.fileTree) {
+            webContainer?.mount(messageObj.fileTree);
+            setFileTree(messageObj.fileTree);
+          }
+        } catch (e) {
+          // Not JSON, ignore
+        }
       }
 
       setMessages(prev => [...prev, data])
@@ -179,16 +179,17 @@ const Project = () => {
       setUsers(res.data.users)
     }).catch(console.log)
   }, [])
-   
-  function saveFileTree(ft){
+
+  function saveFileTree(ft) {
+    console.log('Sending fileTree:', ft)
     axios.put('/project/update-file-tree',
-      {projectId:project._id,fileTree:ft}).then(res=>{console.log(res.data)}).catch(err=>{console.log(err)})
+      { projectId: project._id, fileTree: ft }).then(res => { console.log(res.data) }).catch(err => { console.log(err) })
   }
 
   // Helper function to get file content safely
   const getFileContent = (fileName) => {
     if (!fileTree[fileName]) return '';
-    
+
     // Handle different possible structures
     if (fileTree[fileName].file && fileTree[fileName].file.contents) {
       return fileTree[fileName].file.contents;
@@ -324,7 +325,7 @@ const Project = () => {
                       write(chunk) { console.log(chunk) }
                     }))
 
-                    if(runProcess){
+                    if (runProcess) {
                       runProcess.kill()
                     }
 
@@ -371,7 +372,7 @@ const Project = () => {
                       saveFileTree(ft)
                     }}
                     dangerouslySetInnerHTML={{
-                      __html: hljs.highlight('javascript', getFileContent(currentFile)).value
+                      __html: hljs.highlight(getFileContent(currentFile), { language: 'javascript' }).value
                     }}
                     style={{
                       whiteSpace: 'pre-wrap',
@@ -394,10 +395,10 @@ const Project = () => {
         {iframeUrl && webContainer && (
           <div className="flex min-w-96 flex-col h-full">
             <div className='address-bar'>
-              <input type="text" onChange={(e)=> setIframeUrl(e.target.value)} value={iframeUrl} className='w-full p-2 px-4 bg-slate-200'></input>
+              <input type="text" onChange={(e) => setIframeUrl(e.target.value)} value={iframeUrl} className='w-full p-2 px-4 bg-slate-200'></input>
             </div>
-          <iframe src={iframeUrl} className="w-full h-full" title="WebContainer Preview"></iframe>
-        </div>)}
+            <iframe src={iframeUrl} className="w-full h-full" title="WebContainer Preview"></iframe>
+          </div>)}
       </section>
 
       {isModalOpen && (
@@ -424,7 +425,7 @@ const Project = () => {
               ))}
             </div>
             <button
-               onClick={() => addCollaborators()}
+              onClick={() => addCollaborators()}
               className='absolute bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-blue-600 text-white rounded-md'>
               Add Collaborators
             </button>
