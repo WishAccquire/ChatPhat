@@ -54,12 +54,38 @@ const Project = () => {
       projectId: project._id,
       users: Array.from(selectedUserId)
     }).then(res => {
-
       setProject(res.data)
       setIsModalOpen(false)
     }).catch(err => {
       console.log(err)
     })
+  }
+
+  // Load previous messages from database
+  const loadMessages = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`/message/project/${project._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      const formattedMessages = response.data.messages.map(msg => ({
+        sender: msg.messageType === 'ai' ? { _id: 'ai', email: 'AI' } : msg.sender,
+        message: msg.content,
+        messageType: msg.messageType
+      }))
+      
+      setMessages(formattedMessages)
+      
+      // Scroll to bottom after loading messages
+      setTimeout(() => {
+        if (messageBox.current) {
+          messageBox.current.scrollTop = messageBox.current.scrollHeight
+        }
+      }, 100)
+    } catch (error) {
+      console.error('Error loading messages:', error)
+    }
   }
 
   const send = () => {
@@ -139,6 +165,10 @@ const Project = () => {
   }
 
   useEffect(() => {
+    if (!project._id) return;
+
+    // Load previous messages first
+    loadMessages();
 
     initializeSocket(project._id)
 
@@ -178,7 +208,7 @@ const Project = () => {
     axios.get('/users/all').then(res => {
       setUsers(res.data.users)
     }).catch(console.log)
-  }, [])
+  }, [project._id])
 
   function saveFileTree(ft) {
     console.log('Sending fileTree:', ft)

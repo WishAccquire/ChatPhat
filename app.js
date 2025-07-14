@@ -8,6 +8,8 @@ import userRoutes from './routes/user.routes.js'
 import ProjectRoutes from './routes/project.routes.js'
 import cookieParser from 'cookie-parser';
 import aiRoutes from './routes/ai.routes.js';
+import messageRoutes from './routes/message.routes.js'
+
 import cors from 'cors'
 connect();
 
@@ -23,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", userRoutes)
 app.use("/project", ProjectRoutes)
 app.use("/ai",aiRoutes)
+app.use("/message", messageRoutes)
 
 app.get('/', (req, res) => {
     res.send("Chal gaya Mein");
