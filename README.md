@@ -1,6 +1,30 @@
-ChatPhat – AI-Powered Real-Time Chat App
+# 🚀 **[Live Deployment: https://chatphat.onrender.com](https://chatphat.onrender.com)**
 
-**ChatPhat** is a feature-rich, full-stack real-time collaboration and messaging app built using the **MERN stack**, with enhanced functionalities powered by **Google Gemini AI**, **Redis**, and **Socket.io**.
+---
+
+## 🌐 Deployment Details
+
+This project is deployed on **Render**:  
+**[https://chatphat.onrender.com](https://chatphat.onrender.com)**
+
+- The deployment uses a free Render service, which may cause some features to load slowly or go to sleep after inactivity.
+- Some advanced features (such as real-time file execution, AI code generation, or socket-based updates) may not work as expected on the deployed version due to Render’s limitations (cold starts, resource limits, or lack of persistent file system).
+- **All features work perfectly on localhost.**  
+  If you want to experience the full functionality, please run the project locally by following the setup instructions below.
+
+---
+
+## 🎥 Feature Demo Video
+
+Some features are best experienced locally.  
+Watch this video to see all features in action (including those that may not work on the deployed site):
+
+**[▶️ Watch Full Feature Demo](https://drive.google.com/drive/folders/1WGVVzCqiOqksRgCa9kTLspXXARUGt58x?usp=sharing)**
+
+---
+
+> **Note:**  
+> If you encounter any issues on the deployed site, please refer to the video above or try running the app locally for the best experience.
 
 ---
 
