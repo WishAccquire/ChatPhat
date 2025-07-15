@@ -339,7 +339,7 @@ const Project = () => {
               ))}
             </div>
 
-            <div className="actions flex gap-2">
+           {/*  <div className="actions flex gap-2">
               <button
                 onClick={async () => {
                   if (!webContainer || Object.keys(fileTree).length === 0) {
@@ -377,7 +377,7 @@ const Project = () => {
               >
                 Run
               </button>
-            </div>
+            </div>*/}
           </div>
 
           <div className="bottom flex flex-grow max-w-full shrink overflow-auto">

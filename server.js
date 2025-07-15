@@ -81,7 +81,7 @@ io.on('connection', socket => {
       try {
         await saveMessage({
           content: result,
-          senderId: 'ai',
+           
           projectId: socket.project._id,
           messageType: 'ai'
         });
