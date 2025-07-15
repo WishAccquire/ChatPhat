@@ -8,7 +8,7 @@ This project is deployed on **Render**:
 **[https://chatphat.onrender.com](https://chatphat.onrender.com)**
 
 - The deployment uses a free Render service, which may cause some features to load slowly or go to sleep after inactivity.
-- Some advanced features (such as real-time file execution, AI code generation, or socket-based updates) may not work as expected on the deployed version due to Render’s limitations (cold starts, resource limits, or lack of persistent file system).
+- Some advanced features (such as real-time file execution) may not work as expected on the deployed version due to Render’s limitations (cold starts, resource limits, or lack of persistent file system).
 - **All features work perfectly on localhost.**  
   If you want to experience the full functionality, please run the project locally by following the setup instructions below.
 
