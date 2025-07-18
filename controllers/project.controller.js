@@ -1,5 +1,5 @@
 import Project from "../models/project.model.js";
-import { addUsertoproject, createProject, getAllProjectByUserId, getprojectbyid } from "../services/project.service.js";
+import { addUsertoproject, createProject, getAllProjectByUserId, getprojectbyid ,updateFileTree} from "../services/project.service.js";
 import { validationResult} from 'express-validator';
 import userModel from '../models/user.model.js';
 
@@ -77,7 +77,7 @@ export const getProject=async (req,res)=>{
    }
 }
 
-export const updateFileTree=async (req,res)=>{
+export const updatedFileTree=async (req,res)=>{
    const errors=validationResult(req)
 
    if(!errors.isEmpty()){

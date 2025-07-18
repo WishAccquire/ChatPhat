@@ -19,7 +19,7 @@ const projectSchema = new mongoose.Schema({
         }
     ],fileTree:{
         type:Object,
-        deafult:{}
+        default:{}
     }
 })
 
