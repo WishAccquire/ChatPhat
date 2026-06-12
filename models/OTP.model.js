@@ -32,12 +32,15 @@ async function verification(Email,Otp) {
     }
 }
 
-OtpSchema.pre("save",async function(next){
-  //console.log("hello");
-    const ir=await verification(this.Email,this.Otp);
+OtpSchema.pre("save", async function(next) {
+  try {
+    await verification(this.Email, this.Otp);
     next();
-}
-)
+  } catch (err) {
+    console.error("Pre-save error:", err);
+    next(err);
+  }
+});
 
 const OTP = mongoose.model("OTP", OtpSchema);
 export default OTP;
