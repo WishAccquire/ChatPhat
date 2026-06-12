@@ -52,7 +52,9 @@ export const sendOtp = async (req, res) => {
             Otp: generateotp,
         };
 
+        console.log("1");
         const otpBody = await OTP.create(payload);
+        console.log("2");
 
        // console.log("OTP Saved:", otpBody);
 
