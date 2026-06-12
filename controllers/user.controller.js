@@ -54,7 +54,7 @@ export const sendOtp = async (req, res) => {
 
         const otpBody = await OTP.create(payload);
 
-        console.log("OTP Saved:", otpBody);
+       // console.log("OTP Saved:", otpBody);
 
         return res.status(201).json({
             success: true,
@@ -137,7 +137,7 @@ export const LoginController=async(req,res)=>{
 }
 
 export const profileController=async(req,res)=>{
-   console.log(req.user);
+   //console.log(req.user);
 
    res.status(200).json({
       user:req.user
