@@ -19,7 +19,7 @@ export const createUser = async ({ email, password,otp }) => {
         }
 
         const recentOtp=await OTP.find({Email:email}).sort({CreatedAt:-1}).limit(1);
-        console.log("recent otp",recentOtp);
+       // console.log("recent otp",recentOtp);
 
         //validate
         if(recentOtp.length === 0){
