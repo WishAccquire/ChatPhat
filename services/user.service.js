@@ -18,22 +18,15 @@ export const createUser = async ({ email, password,otp }) => {
 
         }
 
-        const recentOtp=await OTP.find({Email:email}).sort({createdAt:-1}).limit(1);
+        const recentOtp=await OTP.find({Email:email}).sort({CreatedAt:-1}).limit(1);
         console.log("recent otp",recentOtp);
 
         //validate
-        if(recentOtp.length==0|| !recentOtp[0]){
-            return res.status(401).json({
-                success: false,
-                message: "OTP Not Fount"
-            })
+        if(recentOtp.length === 0){
+            throw new Error("OTP Not Found");
         }
-
-        else if( otp.toString()!==recentOtp[0].Otp.toString()){
-            return res.status(401).json({
-                success: false,
-                message: "Invalid OTP. ENter Valid OTP"
-            })
+        if(otp.toString() !== recentOtp[0].Otp.toString()){
+            throw new Error("Invalid OTP");
         }
 
         const hashPassword = await userModel.hashPassword(password);
