@@ -10,7 +10,7 @@ const OtpSchema=new mongoose.Schema({
   },
   CreatedAt:{
     type:Date,
-    default:Date.now(),
+    default:Date.now,
     expires:5*60*1000,
   },
   Otp:{
@@ -22,7 +22,7 @@ const OtpSchema=new mongoose.Schema({
 
 async function verification(Email,Otp) {
     try{
-        const mailResponse=await mail(Email,"Verification Email From StudyNotion",otpTemplate(Otp));
+        const mailResponse=await mail(Email,"Verification Email From ChatPhat",otpTemplate(Otp));
        
         console.log("Mail Send Successfully",mailResponse);
 
