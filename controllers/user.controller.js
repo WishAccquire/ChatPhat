@@ -5,7 +5,7 @@ import { validationResult } from "express-validator";
 import validator from "validator";
 import otpGenerator from 'otp-generator';
 import OTP from "../models/OTP.model.js";
-import { mail } from "../utils/mail.js";
+import { mail } from "../utils/Mail.js";
 
 export const sendOtp = async (req, res) => {
     try {
